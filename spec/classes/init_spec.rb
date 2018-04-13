@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require_relative '../versions.rb'
 
 describe 'Dm_crypt' do
   default_params = {
