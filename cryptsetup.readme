@@ -1,0 +1,56 @@
+# create a 100M file in /opt
+dd if=/dev/zero of=/apps/sdb-backstore bs=1M count=100
+
+# create the loopback block device
+# where 7 is the major number of loop device driver, grep loop /proc/devices
+mknod /dev/sdb b 7 200
+
+losetup /dev/sdb  /apps/sdb-backstore
+
+echo -n "C33s-J@N" | cryptsetup --verbose --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random luksFormat /dev/sdb
+
+echo -n "C33s-J@N" | cryptsetup open --type luks /dev/sdb postgressDB
+echo -n "C33s-J@N" | cryptsetup open --type luks /dev/sdb postgressDB
+
+openssl genpkey -algorithm RSA  -out /etc/puppetlabs/puppet/ssl/private_keys/xpmz6ugewi89hmz.vmpoolerdta.local.pem -pkeyopt rsa_keygen_bits:2048
+openssl rsa -pubout -in /etc/puppetlabs/puppet/ssl/private_keys/xpmz6ugewi89hmz.vmpoolerdta.local.pem -out /etc/puppetlabs/puppet/ssl/public_keys/xpmz6ugewi89hmz.vmpoolerdta.local.pem 
+
+facter -p encrypted_secret|base64 -d | openssl rsautl -decrypt -inkey /etc/puppetlabs/puppet/ssl/private_keys/`hostname`.pem
+
+mkfs /dev/mapper/postgressDB
+
+mount /dev/mapper/postgressDB /apps/postgressdb
+
+umount /apps/postgressdb
+
+cryptsetup close postgressDB
+
+cryptsetup luksDump /dev/sdb | grep Slot
+
+cryptsetup luksAddKey /dev/sdb
+cryptsetup luksAddKey /dev/sdb -S 5
+
+cryptsetup luksRemoveKey /dev/sdb
+cryptsetup luksKillSlot /dev/sdb 5
+
+cryptsetup luksAddKey  /dev/sdb masterkeyfile
+
+# Forgotten luks key
+1.Extract the current encrypted key from the LUKS partition
+2.Create a new LUKS key using the above extracted encrypted key
+dmsetup table --showkeys
+postgressDB: 0 200704 crypt aes-xts-plain64 2aff13f00ce58eb00dcc41af198b63340fc6e3ef33c1ee7c5aec34d5add453a2d8c74c4f4d31f58aee61562d5f79484202f30d8cb3035d0a8aa7feed22cf34b2 0 7:200 409                                                     6
+get key from output and save as file
+echo 2aff13f00ce58eb00dcc41af198b63340fc6e3ef33c1ee7c5aec34d5add453a2d8c74c4f4d31f58aee61562d5f79484202f30d8cb3035d0a8aa7feed22cf34b2 > existinglukskey.txt
+
+create binary file from key file
+xxd -r -p existinglukskey.txt existinglukskey.bin
+
+#Reset Forgotten LUKS Key – Add a New Key
+#Finally, add a new LUKS key by using the existing LUKS key that we extracted into the binary file.
+
+cryptsetup luksAddKey /dev/sdb1 --master-key-file <(cat existinglukskey.bin)
+give new password
+
+cryptsetup luksDump --dump-master-key /dev/sdb
+

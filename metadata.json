@@ -1,0 +1,37 @@
+{
+  "name": "kpn-dm_crypt",
+  "version": "0.3.0",
+  "author": "kpn",
+  "summary": "configure an encrypted filesystem with dm crypt on linux",
+  "license": "proprietary",
+  "source": "git@github.tooling.kpn.org:kpn-puppet-forge/puppet-kpn-dm_crypt",
+  "project_page": "https://github.tooling.kpn.org/kpn-puppet-forge/puppet-kpn-dm_crypt",
+  "issues_url": "https://github.tooling.kpn.org/kpn-puppet-forge/puppet-kpn-dm_crypt/issues",
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">=4.6.0 <5.0.0"
+    }
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": [
+        "6.0",
+        "7.0"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": "4.x"
+    }
+  ],
+  "tags": [
+    "dm_crypt"
+  ],
+  "pdk-version": "1.4.1",
+  "template-url": "file:///opt/puppetlabs/pdk/share/cache/pdk-templates.git",
+  "template-ref": "1.4.1-0-g52adbbb"
+}

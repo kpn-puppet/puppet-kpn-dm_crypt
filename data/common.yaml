@@ -1,0 +1,5 @@
+---
+dm_crypt::password: "%{encrypted_secret}"
+dm_crypt::config_ensure: 'present'
+dm_crypt::package_ensure: 'present'
+dm_crypt::package_name: 'cryptsetup'
