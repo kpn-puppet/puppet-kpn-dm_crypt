@@ -17,11 +17,11 @@ class { 'dm_crypt':
 }
 # Configure crypt luks partition including creation of path
 # dm_crypt::config
-dm_crypt::config { postgresDB:
+dm_crypt::config { 'postgresDB':
   ensure          => present,
-  disk_device     => "/dev/mapper/vg_postgress-postgresDB",
-  mount_point     => /media/postgresDB,
-  filesystem_type => ext4,
+  disk_device     => '/dev/mapper/vg_postgress-postgresDB',
+  mount_point     => '/media/postgresDB',
+  filesystem_type => 'ext4',
   password        => $::encrypted_secret,
 }
 #crypt { 'postgresDB':

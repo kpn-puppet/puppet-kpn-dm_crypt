@@ -1,3 +1,5 @@
 inherit_gem:
   kpn-style:
     - ruby-2.4.yml
+
+inherit_from: .rubocop_todo.yml

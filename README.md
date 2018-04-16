@@ -36,7 +36,7 @@ You need to supply a base64 encrypted password based on the puppet agent certifi
 
 This module requires:
 
-* [puppetlabs-stdlib](https://github.tooling.kpn.org/kpn-puppet-forge/puppet-puppetlabs-stdlib) (version requirement: >= 4.6.0 <5.0.0)
+* [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib) (version requirement: >= 4.6.0 <5.0.0)
 
 ### What dm_crypt affects
 

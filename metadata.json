@@ -3,10 +3,10 @@
   "version": "0.3.0",
   "author": "kpn",
   "summary": "configure an encrypted filesystem with dm crypt on linux",
-  "license": "proprietary",
-  "source": "git@github.tooling.kpn.org:kpn-puppet-forge/puppet-kpn-dm_crypt",
-  "project_page": "https://github.tooling.kpn.org/kpn-puppet-forge/puppet-kpn-dm_crypt",
-  "issues_url": "https://github.tooling.kpn.org/kpn-puppet-forge/puppet-kpn-dm_crypt/issues",
+  "license": "Apache-2.0",
+  "source": "https://github.com/kpn-puppet/puppet-kpn-dm_crypt",
+  "project_page": "https://github.com/kpn-puppet/puppet-kpn-dm_crypt",
+  "issues_url": "https://github.com/kpn-puppet/puppet-kpn-dm_crypt/issues",
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",
