@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'pp'
 require_relative '../versions.rb'
 
 describe 'Dm_crypt' do
@@ -51,29 +50,9 @@ describe 'Dm_crypt' do
         end
 
         it { is_expected.to compile.with_all_deps }
-
         # Check classes and relations
         it { is_expected.to contain_class('dm_crypt') }
         it { is_expected.to contain_class('dm_crypt::install') }
-
-        # Check common resources
-#        it {
-#          is_expected.to contain_file('/data').with(
-#            'ensure' => 'directory',
-#            'owner'  => 'root',
-#            'group'  => 'root',
-#            'mode'   => '0755',
-#          )
-#        }
-#        it {
-#          is_expected.to contain_file('/data/storage').with(
-#            'ensure' => 'directory',
-#            'owner'  => 'root',
-#            'group'  => 'root',
-#            'mode'   => '0755',
-#          )
-#        }
-#        it { is_expected.to contain_crypt('storage') }
         if facts['os']['release']['major'] == '6'
           it { is_expected.to contain_package('cryptsetup-luks') }
         else
