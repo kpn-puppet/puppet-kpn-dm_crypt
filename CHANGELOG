@@ -1,3 +1,7 @@
+2018-06-22 Release 0.3.1
+- The module name in metadata.json was invalid causing errors when checking out this module with r10k/code manager
+- Removed unused file
+
 2018-03-20 Release 0.3.0
 - To locate the puppet agent cert files we now use the agent->certname from the puppet.config
 - Lot's of rubocop improvement in code styling
