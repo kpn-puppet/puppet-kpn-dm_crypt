@@ -14,9 +14,8 @@ Puppet::Type.type(:crypt).provide(:debian) do
   commands umount:     'umount'
 
   def password
-    # Public key existence is handled in encrypted_secret.rb.
-    public_key = "#{Puppet.settings[:hostpubkey]}"
-    execute("echo #{resource[:password]}| base64 -d | openssl rsautl -decrypt -inkey #{public_key}")
+    private_key = "#{Puppet.settings[:hostprivkey]}"
+    execute("echo #{resource[:password]}| base64 -d | openssl rsautl -decrypt -inkey #{private_key}")
   end
 
   def exists?
