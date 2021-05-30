@@ -6,10 +6,6 @@ class dm_crypt (
   String $package_name,
 ) {
 
-  unless ("${facts['os']['family']}${facts['os']['release']['major']}" =~ /(RedHat(6|7))/) {
-    fail("Module ${module_name} is not supported on ${::facts['os']['family']} ${::facts['os']['release']['major']}.")
-  }
-
   # call the classes that do the real work
   class { '::dm_crypt::install':
     ensure  => $package_ensure,
