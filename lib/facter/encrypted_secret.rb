@@ -19,8 +19,8 @@ Facter.add('encrypted_secret') do
     # Generate password and save as fact
     unless data.key?('encrypted_secret')
       # Generate a public key using the host cert
-      public_key = "#{Puppet.settings[:hostpubkey]}"
-      if not File.file?(public_key)
+      public_key = Puppet.settings[:hostpubkey].to_s
+      unless File.file?(public_key)
         certificate = "#{Puppet.settings[:certdir]}/#{Facter.value(:fqdn).downcase}.pem"
         Facter::Core::Execution.execute("openssl x509 -pubkey -noout -in #{certificate} > #{public_key}")
       end

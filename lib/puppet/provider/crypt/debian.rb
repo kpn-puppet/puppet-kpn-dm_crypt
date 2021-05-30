@@ -14,7 +14,7 @@ Puppet::Type.type(:crypt).provide(:debian) do
   commands umount:     'umount'
 
   def password
-    private_key = "#{Puppet.settings[:hostprivkey]}"
+    private_key = Puppet.settings[:hostprivkey].to_s
     execute("echo #{resource[:password]}| base64 -d | openssl rsautl -decrypt -inkey #{private_key}")
   end
 
