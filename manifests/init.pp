@@ -6,6 +6,10 @@ class dm_crypt (
   String $package_name,
 ) {
 
+  if $facts['kernel'] != 'Linux' {
+    fail("Module ${module_name} is not supported on ${::facts['kernel']}.")
+  }
+
   # call the classes that do the real work
   class { '::dm_crypt::install':
     ensure  => $package_ensure,
