@@ -6,8 +6,8 @@ class dm_crypt (
   String $package_name,
 ) {
 
-  unless ("${facts['os']['family']}${facts['os']['release']['major']}" =~ /(RedHat(6|7))/) {
-    fail("Module ${module_name} is not supported on ${::facts['os']['family']} ${::facts['os']['release']['major']}.")
+  if $facts['kernel'] != 'Linux' {
+    fail("Module ${module_name} is not supported on ${::facts['kernel']}.")
   }
 
   # call the classes that do the real work
