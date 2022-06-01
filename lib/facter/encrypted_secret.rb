@@ -8,6 +8,7 @@ Facter.add('encrypted_secret') do
   confine kernel: :Linux
   setcode do
     data = {}
+    puppet_conf = '/etc/puppetlabs/puppet/puppet.conf'
     es_yaml = '/opt/puppetlabs/facter/facts.d/encrypted_secret.yaml'
 
     # Search yaml file
@@ -18,12 +19,10 @@ Facter.add('encrypted_secret') do
 
     # Generate password and save as fact
     unless data.key?('encrypted_secret')
-      # Generate a public key using the host cert
-      public_key = Puppet.settings[:hostpubkey].to_s
-      unless File.file?(public_key)
-        certificate = "#{Puppet.settings[:certdir]}/#{Facter.value(:fqdn).downcase}.pem"
-        Facter::Core::Execution.execute("openssl x509 -pubkey -noout -in #{certificate} > #{public_key}")
-      end
+      # lookup public key file name
+      puppet_conf_hash = ini2hash(puppet_conf)
+      certname = puppet_conf_hash['agent']['certname']
+      public_key = "/etc/puppetlabs/puppet/ssl/public_keys/#{certname}.pem"
       command = "dd if=/dev/urandom bs=512 count=200 | tr -dc _A-Z-a-z-0-9 | head -c${1:-64} | openssl rsautl -encrypt -inkey #{public_key} -pubin | base64 | tr -d \"\n\""
       password = Facter::Core::Execution.execute(command)
       data = data.merge('encrypted_secret' => password)
@@ -35,4 +34,21 @@ Facter.add('encrypted_secret') do
 
     data['encrypted_secret']
   end
+end
+
+def i2h_parse_line(line)
+  line.strip.split(';').first =~ %r{^\[([a-zA-Z0-9]+)\]$|^([a-zA-Z0-9\.]+)\s*\=\s*([a-zA-Z0-9\.]+)$}
+  [Regexp.last_match(1), Regexp.last_match(2), Regexp.last_match(3)]
+end
+
+def ini2hash(filename)
+  ini = {}
+  cur_section = nil
+  File.open(filename).each do |line|
+    data = i2h_parse_line(line)
+    cur_section = data[0] unless data[0].nil?
+    ini[cur_section] = {} unless data[0].nil?
+    ini[cur_section].merge!(data[1] => data[2]) if data[1]
+  end
+  ini
 end
