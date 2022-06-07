@@ -5,7 +5,7 @@ Puppet::Type.type(:crypt).provide(:debian) do
   initvars
 
   # Make sure we find all commands on CentOS and FreeBSD
-  ENV['PATH'] = ENV['PATH'] + ':/usr/bin:/usr/sbin:/bin:/sbin'
+  ENV['PATH'] = "#{ENV['PATH']}:/usr/bin:/usr/sbin:/bin:/sbin"
 
   confine osfamily: :debian
   commands cryptsetup: 'cryptsetup'
@@ -63,8 +63,7 @@ end
 
 def i2h_parse_line(line)
   line.strip.split(';').first =~ %r{^\[([a-zA-Z0-9]+)\]$|^([a-zA-Z0-9\.]+)\s*\=\s*([a-zA-Z0-9\.]+)$}
-  data = [Regexp.last_match(1), Regexp.last_match(2), Regexp.last_match(3)]
-  data
+  [Regexp.last_match(1), Regexp.last_match(2), Regexp.last_match(3)]
 end
 
 def ini2hash(filename)

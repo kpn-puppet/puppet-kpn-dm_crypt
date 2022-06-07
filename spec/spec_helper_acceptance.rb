@@ -3,7 +3,7 @@
 require 'beaker-rspec/spec_helper'
 require 'beaker-rspec/helpers/serverspec'
 require 'beaker/puppet_install_helper'
-require_relative 'spec_helper_acceptance_methods'
+require 'kpn_spec_methods'
 
 UNSUPPORTED_PLATFORMS = ['windows'].freeze
 
@@ -12,7 +12,7 @@ unless ENV['RS_PROVISION'] == 'no' || ENV['BEAKER_provision'] == 'no'
   run_puppet_install_helper
 
   # Clone module dependencies
-  clone_dependent_modules
+  KpnSpecMethods.clone_dependent_modules
 end
 
 RSpec.configure do |c|
@@ -41,7 +41,7 @@ RSpec.configure do |c|
 
     puppet_module_install(source: proj_root, module_name: 'dm_crypt')
     # Install dependent modules
-    install_dependent_modules
+    KpnSpecMethods.install_dependent_modules
 
     # Perform further configuration tasks here
   end

@@ -17,13 +17,11 @@
 
 ## Overview
 
-This module will create an encrypted partion for a device using dm-crypt cryptsetup.
+This module will create a encrypted partion for a device using dm-crypt cryptsetup.
 Be very carefull to keep you secret otherwise your data is never accessable again.
 
-!!!  Backup your secret including the used certificates for the encryption  !!!
-
 ## Module Description
-This module cerates an encrypted_secret external fact in /opt/puppetlabs/facter/facts.d/encrypted_secret.yaml.
+
 This module creates an encrypted partion on a disk device with the executable cryptsetup.
 You need to specify the disk device which will be encrypted.
 You need to specitfy the mount point to mount the encrypted partition.
@@ -36,7 +34,7 @@ You need to supply a base64 encrypted password based on the puppet agent certifi
 
 This module requires:
 
-* [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib) (version requirement: >= 4.6.0 <5.0.0)
+* [puppetlabs-stdlib](https://github.tooling.kpn.org/kpn-puppet-forge/puppet-puppetlabs-stdlib) (version requirement: >= 4.6.0 <5.0.0)
 
 ### What dm_crypt affects
 
@@ -53,22 +51,51 @@ For example creating a base64 encrypted password based on de puppet agent public
 echo "my secret passphrase" | openssl rsautl -encrypt -inkey /etc/puppetlabs/puppet/ssl/public_keys/`hostname`.pem -pubin | base64 | tr -d "\n"
 
 There is also a generated fact called `encrypted_secret` that can be used as password. This fact is stored in the file `/opt/puppetlabs/facter/facts.d/encrypted_secret.yaml`.
-!!!  Backup this secret including the used certificates for the encryption  !!!
-
-
-## Usage
 
 ### Beginning with dm_crypt
 
-include dm_crypt to install the software package
+## Usage
 
 ### Parameters
 
 This module accepts the following parameters:
 
+  String         $disk_device,
+  String         $mount_point,
+  String         $filesystem_type,
+  String         $password,
   String         $config_ensure,
   String         $pacakge_ensure,
   String         $package_name,
+
+#### disk_device (required)
+
+Type: string
+Default: `undef`
+Values: any valid string representing a existing disk device for example /dev/sdb
+Description: This parameter contains a tring with the disk device used for the encrypted partition
+
+#### mount_point (required)
+
+Type: string
+Default: `undef`
+Values: any valid string with a valid abslotu path of the mount point where the encrypted partion will be mounted
+Description: This parameter contains the mount point an the last directory of the path will be used as the label for the encrypted luks device
+
+#### filesytem_type (required)
+
+Type: Enum[string]
+Default: `undef`
+Values: 'ext4' or 'xfs'
+Description: This parameter contains the filesystem type for mkfs to format the new encrypted partion.
+
+#### password (required)
+
+type: string
+Default: `undef`
+Values: base64 encrypted string based on the puppet agent certificates
+Description: This parameter contains the encrypted password in base64 format encryption based on the puppet agent certificates
+you can supply this password as external fact encrypted_secret
 
 #### config_ensure
 
@@ -93,74 +120,29 @@ Default: `'cryptsetup'`
 Values: any velis sting with the coreect package name
 Description: The package that will be installed.
 
-### defined type dm_crypt::config
-  This defined type creates the directory path and calls the crypt resource for enabling  encryption on the specified device
-
-### Parameters for dm_crypt config
-
-  String         $disk_device,
-  String         $mount_point,
-  String         $filesystem_type,
-  String         $password,
-
-#### disk_device (required)
-
-Type: string
-Default: `undef`
-Values: any valid string representing a existing disk device for example /dev/sdb
-Description: This parameter contains a tring with the disk device used for the encrypted partition
-
-#### mount_point (required)
-
-Type: string
-Default: `undef`
-Values: any valid string with a valid abslotu path of the mount point where the encrypted partion will be mounted
-Description: This parameter contains the mount point, the last directory of the path will be used as the label for the encrypted luks device
-
-#### filesytem_type (required)
-
-Type: Enum[string]
-Default: `ext4`
-Values: 'ext4' or 'xfs'
-Description: This parameter contains the filesystem type for mkfs to format the new encrypted partion.
-
-#### password (required)
-
-type: string
-Default: $encrypted_secret
-Values: base64 encrypted string based on the puppet agent certificates
-Description: This parameter contains the encrypted password in base64 format encryption based on the puppet agent certificates
-you can supply this password as external fact encrypted_secret
-
 ### Examples
 
 #### Example 1: Setting the default values for the module
 
 ```puppet
   $encrypted_secret = 'QyY9BNdBSvee5q2H+CzDr8BsSvxPkrSLzvEro8FnwJ8EBCk5/DtGrSU/diBkUHXGqezggZnJumlLwwXIXG+G1/7X+VDwSIoKqnTq/VKzzve8t1My8fZnbuQLS/iTac06umAkqvJbMCc8R+Kl9a8sovxnZa3d9rTu4eMLb5hnWfpFpv9mK2XbbkCsWJqdzDv+XSsEr6nnnyxzsIJ8F8O2SxCvJkR0gHpVdBmNREMbEdAqVXQSeV1eKr4rNitM1CUZq/yi62yjbxQGAj7epZGe0eu6DGFXuoZqh/eAnC4e5XaWh3XxQAFq30vlY953G9yR3l+bFg/MFRmZU4vwaHvWh1D3Bn9O9c8WiW6lc0kUgm/8NfOejPgipOL3r7VhbNdQpyP/rhvvagyuM00dAukd5ATFbi2AnM3C9JQfws8glN+jHOR01N6o3OynfbE3SZrq229XTZM9m3rRWUglbPQFUlNH3M+LjNvdrQGlNVr/3utGUhfUv4OzZz9B5JiMpYO8nBjvbhYeLttOnRJ5G10BSd/9vufJWOh1FkGoVnkBknzjzhc3cRe08uI2T6r6lD4DKpujK0rzgcR15U/fg9BBZLGgD2+vUVvb95SxNY9bgVtk7ZhBYG065828i1omt7C4F7rkWPtcSovts9U1OAjKqsQ5yfFlmqjjRwr9gwyFWbE='
-
   class { 'dm_crypt':
-    ensure_package => 'present',
-    package_name   => 'cryptsetup',
-  }
-  dm_crypt::config { postgresDB:
-    ensure          => present,
-    disk_device     => "/dev/mapper/vg_postgress-postgresDB",
-    mount_point     => /media/postgresDB,
-    filesystem_type => ext4,
-    password        => $::encrypted_secret,
+    ensure          => 'present',
+    disk_device     => '/dev/sdb',
+    mount_point     => '/apps/postgresDB',
+    filesystem_type => 'ext4',
+    password        => $encrypted_secret,
   }
 ```
 
 #### Example 2: Use generated encrypted_secret fact
 
 ```puppet
-  include dm_crypt
-  dm_crypt::config { postgresDB:
-    ensure          => present,
-    disk_device     => "/dev/mapper/vg_postgress-postgresDB",
-    mount_point     => /media/postgresDB,
-    filesystem_type => ext4,
+  class { 'dm_crypt':
+    ensure          => 'present',
+    disk_device     => '/dev/sdb',
+    mount_point     => '/apps/postgresDB',
+    filesystem_type => 'ext4',
     password        => $::facts['encrypted_secret'],
   }
 ```
@@ -170,23 +152,39 @@ you can supply this password as external fact encrypted_secret
 classes:
 
 - [dm_crypt](#dmcrypt)
-
-defined type:
-- [dm_crypt::config](#dm_crypt::config)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Module Description](#module-description)
+  - [Setup](#setup)
+    - [Setup  Requirements](#setup-requirements)
+    - [What dm_crypt affects](#what-dmcrypt-affects)
+    - [Beginning with dm_crypt](#beginning-with-dmcrypt)
+  - [Usage](#usage)
+    - [Parameters](#parameters)
+      - [disk_device (required)](#diskdevice-required)
+      - [mount_point (required)](#mountpoint-required)
+      - [filesytem_type (required)](#filesytemtype-required)
+      - [password (required)](#password-required)
+      - [config_ensure](#configensure)
+      - [package_ensure](#packageensure)
+      - [package_name](#packagename)
+    - [Examples](#examples)
+      - [Example 1: Setting the default values for the module](#example-1-setting-the-default-values-for-the-module)
+      - [Example 2: Use generated encrypted_secret fact](#example-2-use-generated-encryptedsecret-fact)
+  - [Reference](#reference)
+  - [Limitat ions](#limitat-ions)
+  - [Development](#development)
 
 types:
 
 * lib/puppet/type/crypt.rb
-
-facts:
-* lib/puppet/facter/encrypted_secret.rb
 
 providers:
 
 * lib/puppet/providers/crypt/rhel7.rb
 * lib/puppet/providers/crypt/rhel6.rb
 
-## Limitations
+## Limitat ions
 
 This module works only on:
 
@@ -197,7 +195,7 @@ This module works only on:
 
 You can contribute by submitting issues, providing feedback and joining the discussions.
 
-Go to: `https://github.com/kpn-puppet/puppet-kpn-dm_crypt`
+Go to: https://github.com/kpn-puppet/puppet-kpn-dm_crypt
 
 If you want to fix bugs, add new features etc:
 

@@ -1,3 +1,7 @@
+2020-02-11 Release 0.4.0
+- Added RH8 support
+- PE6 adjustments
+
 2018-03-20 Release 0.3.0
 - To locate the puppet agent cert files we now use the agent->certname from the puppet.config
 - Lot's of rubocop improvement in code styling

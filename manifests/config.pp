@@ -2,21 +2,25 @@
 #
 # This class is called from dm_crypt
 #
-define dm_crypt::config (
+class dm_crypt::config (
   $ensure          = $::dm_crypt::config_ensure,
-  $disk_device     = undef,
-  $filesystem_type = ext4,
-  $mount_point     = undef,
-  $password        = $::encrypted_secret,
+  $disk_device     = $::dm_crypt::disk_device,
+  $filesystem_type = $::dm_crypt::filesystem_type,
+  $mount_point     = $::dm_crypt::mount_point,
+  $password        = $::dm_crypt::password,
 ){
 
-    # Create directory tree from $mount_point
+  # Make this a private class
+  assert_private("Use of private class ${name} by ${caller_module_name} not allowed.")
+
+  # Create directory tree from $mount_point
   $mount_point.split('/').reduce |$memo, $value| {
-    ensure_resources('file', { "${memo}/${value}" => {'ensure' => 'directory',
-      'owner'  => 'root',
-      'group'  => 'root',
-      'mode'   => '0755'
-    }})
+    file { "${memo}/${value}":
+      ensure => 'directory',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0755',
+    }
     "${memo}/${value}"
   }
   # get label name from directory name without the complete path
